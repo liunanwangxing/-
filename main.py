@@ -1,5 +1,5 @@
 import cv2
-img = cv2.imread('20du.jpg',cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('down.jpg',cv2.IMREAD_GRAYSCALE)
 face_eg = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 faces = face_eg.detectMultiScale(img)
 
@@ -13,7 +13,7 @@ for(x,y,w,h) in faces:
 
 _, binary_image = cv2.threshold(img, 35, 255, cv2.THRESH_BINARY)
 #边缘检测
-edges = cv2.Canny(img, threshold1=240, threshold2=250)
+edges = cv2.Canny(img, threshold1=160, threshold2=250)
 edges2 = cv2.Canny(binary_image, threshold1=230, threshold2=250)
 
 #窗口尺寸定义
