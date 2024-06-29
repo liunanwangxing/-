@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import numpy as np
 
@@ -45,7 +47,8 @@ def weighting(img1,img2,x,y,w,h):
 
 
 if __name__ == '__main__':
-    img = cv2.imread('liunan.jpg',cv2.IMREAD_GRAYSCALE)
+    start_time = time.perf_counter()
+    img = cv2.imread('down.jpg',cv2.IMREAD_GRAYSCALE)
     face_eg = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     faces = face_eg.detectMultiScale(img)
 
@@ -72,8 +75,16 @@ if __name__ == '__main__':
     img_weighting = np.zeros([height, width])
     weighting(edges,edges2,x1,y1,int(0.6*w),int(0.27*h))
 
-    cv2.imshow('img',img_weighting)
+    # 定义膨胀操作的结构元素（核）
+    kernel = np.ones((9, 9), np.uint8)
 
+    # 应用膨胀操作
+    dilated_image = cv2.dilate(img_weighting, kernel, iterations=1)
+    # cv2.imshow('img3', edges)
+    # cv2.imshow('img2',dilated_image)
+    # cv2.imshow('img',img_weighting)
+    cv2.imwrite("juji.jpg",img_weighting*255)
+    cv2.imwrite("juji2.jpg",dilated_image*255)
 
 
 
@@ -82,12 +93,14 @@ if __name__ == '__main__':
     # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
     # cv2.resizeWindow('img', 650, 750)
 
-
-
-
-
     # cv2.imshow('img',edges2)
     # cv2.imshow('img2',edges)
     # cv2.imshow('img3',binary_image)
+    end_time = time.perf_counter()
+
+    # 计算程序运行时间（以秒为单位）
+    run_time = end_time - start_time
+
+    print(f"程序运行时间为：{run_time}秒")
 
     cv2.waitKey(0)

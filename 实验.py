@@ -1,7 +1,7 @@
 import cv2
 
 if __name__ == '__main__':
-    img = cv2.imread('20du.jpg',cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('down.jpg',cv2.IMREAD_GRAYSCALE)
     face_eg = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     faces = face_eg.detectMultiScale(img)
 
@@ -20,9 +20,7 @@ if __name__ == '__main__':
     edges = cv2.Canny(img, threshold1=200, threshold2=250)
     edges2 = cv2.Canny(binary_image, threshold1=230, threshold2=250)
 
-    im_shape = img.shape
-    height = im_shape[0]
-    width = im_shape[1]
+
 
 
 
