@@ -3,7 +3,7 @@ import numpy as np
 
 # 读取图像
 image = cv2.imread('juji2.jpg', cv2.IMREAD_GRAYSCALE)
-image2 = cv2.imread('down.jpg', cv2.IMREAD_COLOR)
+image2 = cv2.imread('yindu.jpeg', cv2.IMREAD_COLOR)
 
 # 二值化处理
 _, binary_image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
