@@ -1,58 +1,32 @@
-import cv2
-import numpy as np
+import heapq
 
-# 读取图像
-image = cv2.imread('juji2.jpg', cv2.IMREAD_GRAYSCALE)
-image2 = cv2.imread('yindu.jpeg', cv2.IMREAD_COLOR)
 
-# 二值化处理
-_, binary_image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+def find_top_n_numbers_with_indices(lst, n):
+    # 找到前N个最大的数及其对应的下标
+    if n > len(lst):
+        print("N is greater than the length of the list.")
+        return [], []
 
-# 寻找轮廓
-contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # 使用heapq.nlargest找到前N个最大的数
+    largest_n = heapq.nlargest(n, lst)
 
-# 计算每个轮廓的面积，并保留最大的两个轮廓
-contour_areas = [(cv2.contourArea(contour), contour) for contour in contours]
-contour_areas.sort(key=lambda x: x[0], reverse=True)
-largest_contours = [contour_areas[i][1] for i in range(min(2, len(contour_areas)))]
+    # 获取这些数的下标
+    indices = []
+    for num in largest_n:
+        index = lst.index(num)
+        indices.append(index)
+        # 将已找到的元素置为一个不可能的值以防止重复
+        lst[index] = float('-inf')
 
-# 创建彩色图像以绘制结果
-output_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    return largest_n, indices
 
-# 遍历最大的两个轮廓，计算并绘制质心
-for contour in largest_contours:
-    # 计算轮廓的矩
-    M = cv2.moments(contour)
 
-    # 计算质心坐标
-    if M["m00"] != 0:
-        cX = int(M["m10"] / M["m00"])
-        cY = int(M["m01"] / M["m00"])
-    else:
-        cX, cY = 0, 0
+# 示例列表
+numbers = [10, 20, 5, 30, 8, 50, 12, 60, 90, 100, 25, 70, 85, 40, 45]
 
-    # 在输出图像上绘制质心
-    cv2.circle(image2, (cX, cY), 1, (0, 0, 255), -1)
-    cv2.putText(image2, f"({cX}, {cY})", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+# 找到前N个最大的数及其下标
+N = 5
+largest_numbers, indices = find_top_n_numbers_with_indices(numbers, N)
 
-# 显示结果
-cv2.imshow('Detected Centers', image2)
-
-# 保存结果图像
-cv2.imwrite('detected_centers.jpg', image2)
-
-# 等待用户按键
-cv2.waitKey(0)
-
-# 关闭所有窗口
-cv2.destroyAllWindows()
-
-# 打印每个质心的坐标
-for contour in largest_contours:
-    M = cv2.moments(contour)
-    if M["m00"] != 0:
-        cX = int(M["m10"] / M["m00"])
-        cY = int(M["m01"] / M["m00"])
-    else:
-        cX, cY = 0, 0
-    print(f"Center: ({cX}, {cY})")
+print("Largest numbers:", largest_numbers)
+print("Indices:", indices)

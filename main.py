@@ -1,5 +1,5 @@
 import time
-
+import heapq
 import cv2
 import numpy as np
 
@@ -86,15 +86,17 @@ def center_point(img,img_color):
         print(f"Center: ({cX}, {cY})")
 
 
+
 if __name__ == '__main__':
     start_time = time.perf_counter()
-    image = '5.jpeg'
+    image = 'yindu.jpeg'
     img = cv2.imread(image,cv2.IMREAD_GRAYSCALE)
     img_color = cv2.imread(image,cv2.IMREAD_COLOR)
     img_k = img
     face_eg = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     faces = face_eg.detectMultiScale(img)
-
+    x = y = w = h = 0
+    x1 = y1 = w1 = h1 = 0
     #x,y是左上角的点
     for(x,y,w,h) in faces:
         x1 = int(x+0.2*w)
@@ -105,7 +107,7 @@ if __name__ == '__main__':
         # print(x,y,w,h)
 
     #二值化了一下图像
-    _, binary_image = cv2.threshold(img, 35, 255, cv2.THRESH_BINARY)
+    _, binary_image = cv2.threshold(img, 30, 255, cv2.THRESH_BINARY)
     #边缘检测
     edges = cv2.Canny(img, threshold1=160, threshold2=250)
     edges2 = cv2.Canny(binary_image, threshold1=230, threshold2=250)
@@ -118,20 +120,24 @@ if __name__ == '__main__':
     img_weighting = np.zeros([height, width])
     weighting(edges,edges2,x1,y1,int(0.6*w),int(0.27*h))
 
-    # 定义膨胀操作的结构元素（核）
-    kernel = np.ones((9, 9), np.uint8)
+    # # 定义膨胀操作的结构元素（核）
+    # kernel = np.ones((9, 9), np.uint8)
+    #
+    # # 应用膨胀操作
+    # dilated_image = cv2.dilate(img_weighting, kernel, iterations=1)
+    # cv2.imshow('img3', edges)
+    # cv2.imshow('img5', edges2)
+    # cv2.imshow('img6', binary_image)
+    # cv2.imshow('img2',dilated_image)
+    # cv2.imshow('img',img_weighting)
+    #
+    # center_point(dilated_image,img_color)
+    # cv2.imshow('img4', img_color)
+    # cv2.imwrite('cc.jpg', img_weighting*255)
+    cv2.imshow('img', img_weighting)
+    # close(img_weighting,x1,y1,int(0.6*w),int(0.27*h))
 
-    # 应用膨胀操作
-    dilated_image = cv2.dilate(img_weighting, kernel, iterations=1)
-    cv2.imshow('img3', edges)
-    cv2.imshow('img5', edges2)
-    cv2.imshow('img6', binary_image)
-    cv2.imshow('img2',dilated_image)
-    cv2.imshow('img',img_weighting)
-
-    center_point(dilated_image,img_color)
-    cv2.imshow('img4', img_color)
-
+    cv2.imshow('img2', img_weighting)
 
 
     #窗口尺寸定义

@@ -1,45 +1,42 @@
 import cv2
+import numpy as np
 
-if __name__ == '__main__':
-    img = cv2.imread('down.jpg',cv2.IMREAD_GRAYSCALE)
-    face_eg = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-    faces = face_eg.detectMultiScale(img)
+# 读取图像并转换为灰度图像
+image = cv2.imread('cc.jpg')
 
-    #x,y是左上角的点
-    for(x,y,w,h) in faces:
-        x1 = int(x+0.2*w)
-        x2 = int(x + 0.8*w)
-        y1 = int(y+0.23*h)
-        y2 = int(y+0.50*h)
-        # img = cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
-        # print(x,y,w,h)
+# 检查图像是否成功读取
+if image is None:
+    print("Error: Could not read image")
+    exit()
 
-    #二值化了一下图像
-    _, binary_image = cv2.threshold(img, 35, 255, cv2.THRESH_BINARY)
-    #边缘检测
-    edges = cv2.Canny(img, threshold1=200, threshold2=250)
-    edges2 = cv2.Canny(binary_image, threshold1=230, threshold2=250)
+# 转换为灰度图像
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+# 二值化处理
+_, binary_image = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
 
+# 定义闭运算的结构元素（核）
+kernel = np.ones((5, 5), np.uint8)
 
+# 应用闭运算
+closed_image = cv2.morphologyEx(binary_image, cv2.MORPH_CLOSE, kernel)
+closed_image2 = cv2.morphologyEx(closed_image, cv2.MORPH_CLOSE, kernel)
+closed_image3 = cv2.morphologyEx(closed_image2, cv2.MORPH_CLOSE, kernel)
+closed_image4 = cv2.morphologyEx(closed_image3, cv2.MORPH_CLOSE, kernel)
 
+# 显示原始图像和闭运算后的图像
+cv2.imshow('Original Image', image)
+cv2.imshow('Binary Image', binary_image)
+cv2.imshow('Closed Image', closed_image)
+cv2.imshow('Closed Image2', closed_image2)
+cv2.imshow('Closed Image3', closed_image3)
+cv2.imshow('Closed Image4', closed_image4)
 
+# 保存闭运算后的图像
+# cv2.imwrite('closed_image.jpg', closed_image)
 
+# 等待用户按键
+cv2.waitKey(0)
 
-
-
-
-
-    #窗口尺寸定义
-    # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-    # cv2.resizeWindow('img', 650, 750)
-
-
-
-
-
-    cv2.imshow('img',edges2)
-    cv2.imshow('img2',edges)
-    cv2.imshow('img3',binary_image)
-
-    cv2.waitKey(0)
+# 关闭所有窗口
+cv2.destroyAllWindows()
