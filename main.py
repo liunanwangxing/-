@@ -85,18 +85,72 @@ def center_point(img,img_color):
             cX, cY = 0, 0
         print(f"Center: ({cX}, {cY})")
 
+def close(x,y,w,h):
+    global img_weighting,height,width
+    for i in range(w):
+        for j in range(h):
+            if img_weighting[y + j, x + i] == 1:
+                continue
+            s1 = s2 = s3 = s4 = s5 = s6 = s7 = s8 = \
+                0
+            for k in range(50):
+                if y+j+k>=height-1 or y+j-k<1 or x+i+k>=width-1 or x+i-k<1:
+                    continue
+                if img_weighting[y + j + k, x + i] == 1:
+                    s1 = 1
+                if img_weighting[y + j - k, x + i] == 1:
+                    s2 = 1
+                if img_weighting[y + j, x + i + k] == 1:
+                    s3 = 1
+                if img_weighting[y + j, x + i - k] == 1:
+                    s4 = 1
+                if img_weighting[y + j + k, x + i + k] == 1:
+                    s5 = 1
+                if img_weighting[y + j - k, x + i + k] == 1:
+                    s6 = 1
+                if img_weighting[y + j + k, x + i - k] == 1:
+                    s7 = 1
+                if img_weighting[y + j - k, x + i - k] == 1:
+                    s8 = 1
+            #
+            if s1+s2+s3+s4+s5+s6+s7+s8 >= 6:
+                img_weighting[y + j, x + i] = 1
+#计算最大联通区域所占百分比
+def calculate_largest_components_percentage(img):
+    # 二值化处理
+    img = img*255
+    _, binary_image = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+    # 三通道图像转化为单通道图像
+    binary_image = binary_image.astype(np.uint8)
+    # 计算连通域
+    num_labels, labels_im = cv2.connectedComponents(binary_image)
 
+    # 计算每个连通域的面积
+    component_areas = []
+    for label in range(1, num_labels):  # 忽略背景（标签0）
+        area = np.sum(labels_im == label)
+        component_areas.append((area, label))
+
+    # 按面积排序，找到前两个最大的连通域
+    component_areas.sort(reverse=True, key=lambda x: x[0])
+    largest_areas = component_areas[:2]
+
+    # 计算前两个最大连通域所占的百分比
+    total_area = sum(area for area, _ in component_areas)
+    largest_percentage = sum(area for area, _ in largest_areas) / total_area * 100
+    return largest_percentage
 
 if __name__ == '__main__':
     start_time = time.perf_counter()
-    image = 'yindu.jpeg'
+    image = '8.jpeg'
     img = cv2.imread(image,cv2.IMREAD_GRAYSCALE)
     img_color = cv2.imread(image,cv2.IMREAD_COLOR)
     img_k = img
     face_eg = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     faces = face_eg.detectMultiScale(img)
-    x = y = w = h = 0
-    x1 = y1 = w1 = h1 = 0
+    # x = y = w = h = 0
+    # x1 = y1 = w1 = h1 = 0
+
     #x,y是左上角的点
     for(x,y,w,h) in faces:
         x1 = int(x+0.2*w)
@@ -120,11 +174,11 @@ if __name__ == '__main__':
     img_weighting = np.zeros([height, width])
     weighting(edges,edges2,x1,y1,int(0.6*w),int(0.27*h))
 
-    # # 定义膨胀操作的结构元素（核）
-    # kernel = np.ones((9, 9), np.uint8)
-    #
-    # # 应用膨胀操作
-    # dilated_image = cv2.dilate(img_weighting, kernel, iterations=1)
+
+    # 定义膨胀操作的结构元素（核）
+    kernel = np.ones((2, 2), np.uint8)
+
+    # 应用膨胀操作
     # cv2.imshow('img3', edges)
     # cv2.imshow('img5', edges2)
     # cv2.imshow('img6', binary_image)
@@ -134,12 +188,23 @@ if __name__ == '__main__':
     # center_point(dilated_image,img_color)
     # cv2.imshow('img4', img_color)
     # cv2.imwrite('cc.jpg', img_weighting*255)
-    cv2.imshow('img', img_weighting)
-    # close(img_weighting,x1,y1,int(0.6*w),int(0.27*h))
+    cv2.imshow('img1',img_weighting)
+    close(x1,y1,int(0.6*w),int(0.27*h))
 
-    cv2.imshow('img2', img_weighting)
+    cv2.imshow('img2',img_weighting)
+
+    n = 0
+    while True:
+        img_weighting = cv2.dilate(img_weighting, kernel, iterations=1)
+        print(calculate_largest_components_percentage(img_weighting))
+        n=n+1
+        if calculate_largest_components_percentage(img_weighting) >85 or n>=10:
+            break
 
 
+    cv2.imshow('img3', img_weighting)
+    center_point(img_weighting, img_color)
+    cv2.imshow('img4', img_color)
     #窗口尺寸定义
     # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
     # cv2.resizeWindow('img', 650, 750)

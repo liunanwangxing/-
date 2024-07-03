@@ -36,20 +36,20 @@ def calculate_largest_components_percentage(image_path):
     print(f"Second largest component area: {largest_areas[1][0]}")
     print(f"Total area of all components: {total_area}")
     print(f"Percentage of the two largest components: {largest_percentage:.2f}%")
+    #
+    # # 可视化结果并标注连通域
+    # output_image = np.zeros_like(image)
+    # for i, (area, label) in enumerate(component_areas, start=1):
+    #     color = (0, 255, 0) if (area, label) in largest_areas else (0, 0, 255)
+    #     output_image[labels_im == label] = color
+    #
+    #     # 找到连通域的质心以放置标签
+    #     moments = cv2.moments((labels_im == label).astype(np.uint8))
+    #     cX = int(moments["m10"] / moments["m00"])
+    #     cY = int(moments["m01"] / moments["m00"])
+    #     cv2.putText(output_image, str(i), (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
-    # 可视化结果并标注连通域
-    output_image = np.zeros_like(image)
-    for i, (area, label) in enumerate(component_areas, start=1):
-        color = (0, 255, 0) if (area, label) in largest_areas else (0, 0, 255)
-        output_image[labels_im == label] = color
-
-        # 找到连通域的质心以放置标签
-        moments = cv2.moments((labels_im == label).astype(np.uint8))
-        cX = int(moments["m10"] / moments["m00"])
-        cY = int(moments["m01"] / moments["m00"])
-        cv2.putText(output_image, str(i), (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-
-    cv2.imshow('Labeled Connected Components', output_image)
+    # cv2.imshow('Labeled Connected Components', output_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
