@@ -57,7 +57,7 @@ def center_point(img,img_color):
     contour_areas = [(cv2.contourArea(contour), contour) for contour in contours]
     contour_areas.sort(key=lambda x: x[0], reverse=True)
     largest_contours = [contour_areas[i][1] for i in range(min(2, len(contour_areas)))]
-
+    points = []
 
     # 遍历最大的两个轮廓，计算并绘制质心
     for contour in largest_contours:
@@ -70,6 +70,8 @@ def center_point(img,img_color):
             cY = int(M["m01"] / M["m00"])
         else:
             cX, cY = 0, 0
+        points.append(cX)
+        points.append(cY)
 
         # 在输出图像上绘制质心
         cv2.circle(img_color, (cX, cY), 1, (0, 0, 255), -1)
@@ -84,7 +86,7 @@ def center_point(img,img_color):
         else:
             cX, cY = 0, 0
         print(f"Center: ({cX}, {cY})")
-
+    return points
 def close(x,y,w,h):
     global img_weighting,height,width
     for i in range(w):
